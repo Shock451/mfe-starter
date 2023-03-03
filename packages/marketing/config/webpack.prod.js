@@ -1,7 +1,6 @@
 // a fn to merge two webpack config objects
 const { merge } = require("webpack-merge");
 
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 
 // pull in common config
