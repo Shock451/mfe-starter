@@ -13,7 +13,11 @@ const domain = process.env.PRODUCTION_DOMAIN;
 const prodConfig = {
   mode: "production",
   output: {
+    // to resolve some caching problems
     filename: "[name].[contenthash].js",
+    // especially for mf apps. used by some part of webpack for a file built by webpack
+    // e.g. html plugin generating script tags in the html files
+    publicPath: '/container/latest/'
   },
   plugins: [
     new ModuleFederationPlugin({
