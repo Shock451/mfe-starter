@@ -1,4 +1,3 @@
-// this will take the
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
