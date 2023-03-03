@@ -1,5 +1,5 @@
 # name of the workflow: to build and deploy the container
-name: deploy-container
+name: deploy-container-app
 
 # what event to watch for
 on:
