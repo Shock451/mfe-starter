@@ -1,8 +1,6 @@
 // a fn to merge two webpack config objects
 const { merge } = require("webpack-merge");
 
-// this will take the
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 
 // pull in common config
@@ -27,9 +25,6 @@ const devConfig = {
       // can be array of strings or MF plugin will accept the
       // packageJson.dependencies object as an array of strings
       shared: packageJson.dependencies,
-    }),
-    new HtmlWebpackPlugin({
-      template: "./public/index.html",
     }),
   ],
 };

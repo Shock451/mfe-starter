@@ -1,0 +1,43 @@
+# name of the workflow: to build and deploy the container
+name: deploy-container
+
+# what event to watch for
+on:
+  # watch for a push event only on a branch
+  push:
+    # on what branch
+    branches:
+      - main
+      # - master  << uncomment to watch for both main and master
+    # what specific package or path are we watching for changes?
+    paths:
+      - "packages/container/**"
+
+defaults:
+  run:
+    # sets the working directory for the commands below
+    working-directory: packages/container
+
+ 
+# can have multiple different jobs, but they run in parallel by default
+jobs:
+  # this job will build and deploy our project
+  build:
+    # specify the kind of virtual machine/flavor
+    runs-on: ubuntu-latest
+
+    steps:
+      # take the code from our repo and load it into our environment
+      - uses: actions/checkout@v2
+      # install all project dependencies
+      - run: npm install
+      # make webpack build
+      - run: npm run build
+
+      # using the aws cli for deployment
+      - uses: shinyinc/action-aws-cli@v1.2
+      # sync the content of the build files (dist) with the s3 bucket
+      - run: aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/container/latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
