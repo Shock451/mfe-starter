@@ -18,7 +18,6 @@ defaults:
     # sets the working directory for the commands below
     working-directory: packages/container
 
- 
 # can have multiple different jobs, but they run in parallel by default
 jobs:
   # this job will build and deploy our project
@@ -42,3 +41,11 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: "eu-west-1"
+
+      # for automatic invalidation. It's always good to place credentials where they're needed.
+      - run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} --paths "/container.latest/index.html"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "eu-west-1"
+      # the env section could be placed way above, but processes that don't need them should not have access to them for security
