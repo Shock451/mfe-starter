@@ -26,7 +26,7 @@ const prodConfig = {
       remotes: {
         // key maps to first part of import statements that use the marketing module
         // we must know the location of the hosted module at build time
-        marketing: `marketing@${domain}/marketing/remoteEntry.js`,
+        marketing: `marketing@${domain}/marketing/latest/remoteEntry.js`,
       },
       shared: packageJson.dependencies,
     }),

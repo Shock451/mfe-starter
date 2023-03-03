@@ -1,5 +1,5 @@
-# name of the workflow: to build and deploy the container
-name: deploy-container-app
+# name of the workflow: to build and deploy the marketing
+name: deploy-marketing-app
 
 # what event to watch for
 on:
@@ -11,12 +11,12 @@ on:
       # - master  << uncomment to watch for both main and master
     # what specific package or path are we watching for changes?
     paths:
-      - "packages/container/**"
+      - "packages/marketing/**"
 
 defaults:
   run:
     # sets the working directory for the commands below
-    working-directory: packages/container
+    working-directory: packages/marketing
 
 # can have multiple different jobs, but they run in parallel by default
 jobs:
@@ -32,20 +32,18 @@ jobs:
       - run: npm install
       # make webpack build
       - run: npm run build
-        env:
-          PRODUCTION_DOMAIN: ${{ secrets.PRODUCTION_DOMAIN }}
 
       # using the aws cli for deployment
       - uses: shinyinc/action-aws-cli@v1.2
       # sync the content of the build files (dist) with the s3 bucket
-      - run: aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/container/latest
+      - run: aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/marketing/latest
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: "eu-west-1"
 
       # for automatic invalidation. It's always good to place credentials where they're needed.
-      - run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} --paths "/container/latest/index.html"
+      - run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} --paths "/marketing/latest/index.html"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
