@@ -17,7 +17,7 @@ const prodConfig = {
     filename: "[name].[contenthash].js",
     // especially for mf apps. used by some part of webpack for a file built by webpack
     // e.g. html plugin generating script tags in the html files
-    publicPath: '/container/latest/'
+    publicPath: "/container/latest/",
   },
   plugins: [
     new ModuleFederationPlugin({
@@ -27,6 +27,7 @@ const prodConfig = {
         // key maps to first part of import statements that use the marketing module
         // we must know the location of the hosted module at build time
         marketing: `marketing@${domain}/marketing/latest/remoteEntry.js`,
+        auth: `auth@${domain}/auth/latest/remoteEntry.js`,
       },
       shared: packageJson.dependencies,
     }),
