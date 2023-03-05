@@ -1,7 +1,6 @@
 // a fn to merge two webpack config objects
 const { merge } = require("webpack-merge");
 
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 
 // pull in common config
@@ -9,31 +8,23 @@ const commonConfig = require("./webpack.common");
 
 const packageJson = require("../package.json");
 
-const devConfig = {
-  mode: "development",
+const prodConfig = {
+  mode: "production",
   output: {
-    publicPath: "http://localhost:8081/",
-  },
-  devServer: {
-    port: 8081,
-    historyApiFallback: {
-      index: "index.html",
-    },
+    filename: "[name].[contenthash].js",
+    publicPath: "/auth/latest/",
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: "marketing",
+      name: "auth",
       filename: "remoteEntry.js",
       exposes: {
-        "./MarketingApp": "./src/bootstrap",
+        "./AuthApp": "./src/bootstrap",
       },
       shared: packageJson.dependencies,
-    }),
-    new HtmlWebpackPlugin({
-      template: "./public/index.html",
     }),
   ],
 };
 
 // devConfig overrides commonConfig where they overlap
-module.exports = merge(commonConfig, devConfig);
+module.exports = merge(commonConfig, prodConfig);
