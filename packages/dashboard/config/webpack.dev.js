@@ -1,6 +1,7 @@
 // a fn to merge two webpack config objects
 const { merge } = require("webpack-merge");
 
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 
 // pull in common config
@@ -11,25 +12,29 @@ const packageJson = require("../package.json");
 const devConfig = {
   mode: "development",
   output: {
-    publicPath: "http://localhost:8080/",
+    publicPath: "http://localhost:8083/",
   },
   devServer: {
-    port: 8080,
-    historyApiFallback: {
-      index: "index.html",
+    port: 8083,
+    // historyApiFallback: {
+    //   index: "index.html",
+    // },
+    historyApiFallback: true,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
     },
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: "container",
-      remotes: {
-        auth: "auth@http://localhost:8082/remoteEntry.js",
-        dashboard: "dashboard@http://localhost:8083/remoteEntry.js",
-        marketing: "marketing@http://localhost:8081/remoteEntry.js",
+      name: "dashboard",
+      filename: "remoteEntry.js",
+      exposes: {
+        "./DashboardApp": "./src/bootstrap",
       },
-      // can be array of strings or MF plugin will accept the
-      // packageJson.dependencies object as an array of strings
       shared: packageJson.dependencies,
+    }),
+    new HtmlWebpackPlugin({
+      template: "./public/index.html",
     }),
   ],
 };

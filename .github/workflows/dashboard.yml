@@ -1,0 +1,51 @@
+# name of the workflow: to build and deploy the dashboard
+name: deploy-dashboard-app
+
+# what event to watch for
+on:
+  # watch for a push event only on a branch
+  push:
+    # on what branch
+    branches:
+      - main
+      # - master  << uncomment to watch for both main and master
+    # what specific package or path are we watching for changes?
+    paths:
+      - "packages/dashboard/**"
+
+defaults:
+  run:
+    # sets the working directory for the commands below
+    working-directory: packages/dashboard
+
+# can have multiple different jobs, but they run in parallel by default
+jobs:
+  # this job will build and deploy our project
+  build:
+    # specify the kind of virtual machine/flavor
+    runs-on: ubuntu-latest
+
+    steps:
+      # take the code from our repo and load it into our environment
+      - uses: actions/checkout@v2
+      # install all project dependencies
+      - run: npm install
+      # make webpack build
+      - run: npm run build
+
+      # using the aws cli for deployment
+      - uses: shinyinc/action-aws-cli@v1.2
+      # sync the content of the build files (dist) with the s3 bucket
+      - run: aws s3 sync dist s3://${{ secrets.AWS_S3_BUCKET_NAME }}/dashboard/latest
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "eu-west-1"
+
+      # for automatic invalidation. It's always good to place credentials where they're needed.
+      - run: aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_DISTRIBUTION_ID }} --paths "/dashboard/latest/index.html"
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: "eu-west-1"
+      # the env section could be placed way above, but processes that don't need them should not have access to them for security
